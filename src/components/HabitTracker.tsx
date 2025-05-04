@@ -85,7 +85,8 @@ const HabitTracker = () => {
   ]);
 
   // Notification timeout ref
-  const notificationTimeoutRef = useRef(null);
+  const notificationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
 
   // Effects
   // Handle notifications
