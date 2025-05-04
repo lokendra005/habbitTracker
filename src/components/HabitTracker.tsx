@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef} from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell, Legend, ReferenceLine
 } from 'recharts';
 import { format, subDays } from 'date-fns';
+
+// TypeScript interface for Habit
 interface Habit {
   id: string;
   name: string;
@@ -19,24 +21,24 @@ interface Habit {
 
 const HabitTracker = () => {
   // State
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'habits' | 'stats'>('dashboard');
   const [notification, setNotification] = useState<string | null>(null);
   const [showAddHabitModal, setShowAddHabitModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [newHabitName, setNewHabitName] = useState('');
-  
+
   // Initialize darkMode with user preference or system preference
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('darkMode') === 'true' ||
-         (!('darkMode' in localStorage) && 
-         window.matchMedia('(prefers-color-scheme: dark)').matches);
+        (!('darkMode' in localStorage) &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches);
     }
     return false;
   });
-  
+
   // Habits data
-  const [habits, setHabits] = useState([
+  const [habits, setHabits] = useState<Habit[]>([
     {
       id: '1',
       name: 'Water intake',
@@ -98,7 +100,6 @@ const HabitTracker = () => {
   // Notification timeout ref
   const notificationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-
   // Effects
   // Handle notifications
   useEffect(() => {
@@ -118,8 +119,6 @@ const HabitTracker = () => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('darkMode', darkMode.toString());
-      console.log("Dark mode set to:", darkMode);
-      
       if (darkMode) {
         document.documentElement.classList.add('dark');
       } else {
@@ -140,7 +139,7 @@ const HabitTracker = () => {
       }
       return h;
     }));
-    
+
     showNotify(`Updated ${habit.name} progress to ${newValue} ${habit.unit}`);
   };
 
@@ -149,7 +148,7 @@ const HabitTracker = () => {
       showNotify('Please enter a habit name');
       return;
     }
-    const newHabit = {
+    const newHabit: Habit = {
       id: Date.now().toString(),
       name: newHabitName,
       icon: '✨',
@@ -161,9 +160,9 @@ const HabitTracker = () => {
         date: format(subDays(new Date(), 6 - i), 'MMM dd'),
         value: 0
       })),
-      color: `#${Math.floor(Math.random()*16777215).toString(16)}`
+      color: `#${Math.floor(Math.random() * 16777215).toString(16)}`
     };
-    
+
     setHabits([...habits, newHabit]);
     setNewHabitName('');
     setShowAddHabitModal(false);
@@ -178,10 +177,8 @@ const HabitTracker = () => {
     }
   };
 
-  const showNotify = (message: string | null) => {
-    if (typeof message === 'string' || message === null) {
-      setNotification(message);
-    }
+  const showNotify = (message: string) => {
+    setNotification(message);
     if (notificationTimeoutRef.current) {
       clearTimeout(notificationTimeoutRef.current);
     }
@@ -202,8 +199,8 @@ const HabitTracker = () => {
           <span className="text-xl font-bold text-indigo-600 dark:text-indigo-400">✨ HabitTracker</span>
         </div>
         <div className="flex items-center space-x-4">
-          <button 
-            onClick={toggleDarkMode} 
+          <button
+            onClick={toggleDarkMode}
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
             aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
           >
@@ -217,7 +214,7 @@ const HabitTracker = () => {
               </svg>
             )}
           </button>
-          <button 
+          <button
             onClick={() => setShowSettings(true)}
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
           >
@@ -233,7 +230,7 @@ const HabitTracker = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{format(new Date(), 'EEEE, MMMM d')}</h1>
-          <motion.button 
+          <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center space-x-1"
@@ -248,19 +245,19 @@ const HabitTracker = () => {
 
         {/* Tabs */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-6 p-1 flex space-x-1">
-          <button 
+          <button
             className={`flex-1 py-2 px-4 rounded ${activeTab === 'dashboard' ? 'bg-indigo-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
             onClick={() => setActiveTab('dashboard')}
           >
             Dashboard
           </button>
-          <button 
+          <button
             className={`flex-1 py-2 px-4 rounded ${activeTab === 'habits' ? 'bg-indigo-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
             onClick={() => setActiveTab('habits')}
           >
             My Habits
           </button>
-          <button 
+          <button
             className={`flex-1 py-2 px-4 rounded ${activeTab === 'stats' ? 'bg-indigo-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
             onClick={() => setActiveTab('stats')}
           >
@@ -285,9 +282,9 @@ const HabitTracker = () => {
                         </span>
                       </div>
                       <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
-                        <div 
-                          className="h-2 rounded-full transition-all duration-500" 
-                          style={{ 
+                        <div
+                          className="h-2 rounded-full transition-all duration-500"
+                          style={{
                             width: `${Math.min(100, (habit.progress / habit.goal) * 100)}%`,
                             backgroundColor: habit.color
                           }}
@@ -311,12 +308,12 @@ const HabitTracker = () => {
                     <Tooltip />
                     <Legend />
                     {habits.map(habit => (
-                      <Line 
+                      <Line
                         key={habit.id}
-                        type="monotone" 
-                        dataKey="value" 
+                        type="monotone"
+                        dataKey="value"
                         name={habit.name}
-                        stroke={habit.color} 
+                        stroke={habit.color}
                         strokeWidth={2}
                         activeDot={{ r: 8 }}
                         data={habit.history}
@@ -348,8 +345,8 @@ const HabitTracker = () => {
         {activeTab === 'habits' && (
           <div className="space-y-4">
             {habits.map(habit => (
-              <motion.div 
-                key={habit.id} 
+              <motion.div
+                key={habit.id}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow p-5"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -369,7 +366,7 @@ const HabitTracker = () => {
                     <div className="flex items-center bg-indigo-100 dark:bg-indigo-900 px-3 py-1 rounded-full">
                       <span className="text-indigo-600 dark:text-indigo-300 font-medium">🔥 {habit.streak}</span>
                     </div>
-                    <button 
+                    <button
                       className="text-red-500 hover:text-red-700 p-1"
                       onClick={() => handleDeleteHabit(habit.id)}
                     >
@@ -397,11 +394,11 @@ const HabitTracker = () => {
                   <label className="text-sm text-gray-600 dark:text-gray-400 mb-1 block">
                     Today&apos;s progress: {habit.progress} / {habit.goal} {habit.unit}
                   </label>
-                  <input 
-                    type="range" 
-                    min="0" 
-                    max={habit.goal * 2} 
-                    value={habit.progress} 
+                  <input
+                    type="range"
+                    min="0"
+                    max={habit.goal * 2}
+                    value={habit.progress}
                     step="0.5"
                     onChange={(e) => handleUpdateHabitProgress(habit, parseFloat(e.target.value))}
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
@@ -436,7 +433,7 @@ const HabitTracker = () => {
                         <Cell key={`cell-${index}`} fill={habit.color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => (typeof value === 'number' ? `${value.toFixed(1)}%` : `${value}%`)} />
+                    <Tooltip formatter={(value: number) => `${value.toFixed(1)}%`} />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
@@ -449,7 +446,7 @@ const HabitTracker = () => {
       {/* Notification */}
       <AnimatePresence>
         {notification && (
-          <motion.div 
+          <motion.div
             className="fixed bottom-4 right-4 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-lg"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -463,14 +460,14 @@ const HabitTracker = () => {
       {/* Add Habit Modal */}
       <AnimatePresence>
         {showAddHabitModal && (
-          <motion.div 
+          <motion.div
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowAddHabitModal(false)}
           >
-            <motion.div 
+            <motion.div
               className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -514,14 +511,14 @@ const HabitTracker = () => {
       {/* Settings Modal */}
       <AnimatePresence>
         {showSettings && (
-          <motion.div 
+          <motion.div
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowSettings(false)}
           >
-            <motion.div 
+            <motion.div
               className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -529,25 +526,25 @@ const HabitTracker = () => {
               onClick={e => e.stopPropagation()}
             >
               <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Settings</h2>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-700 dark:text-gray-300">Dark Mode</span>
-                  <button 
+                  <button
                     onClick={toggleDarkMode}
                     className={`relative inline-flex items-center h-6 rounded-full w-11 ${
                       darkMode ? 'bg-indigo-600' : 'bg-gray-300'
                     }`}
                   >
                     <span className="sr-only">Toggle dark mode</span>
-                    <motion.span 
+                    <motion.span
                       className="inline-block w-4 h-4 bg-white rounded-full"
                       animate={{ x: darkMode ? 20 : 2 }}
                       transition={{ type: "spring", stiffness: 500, damping: 30 }}
                     />
                   </button>
                 </div>
-                
+
                 <div className="flex space-x-2 pt-4">
                   <button
                     className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md transition-colors"
