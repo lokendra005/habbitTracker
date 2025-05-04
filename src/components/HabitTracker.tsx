@@ -1,15 +1,26 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, SetStateAction } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell, Legend, ReferenceLine
 } from 'recharts';
 import { format, subDays } from 'date-fns';
+interface Habit {
+  id: string;
+  name: string;
+  icon: string;
+  streak: number;
+  goal: number;
+  unit: string;
+  progress: number;
+  history: Array<{ date: string; value: number }>;
+  color: string;
+}
 
 const HabitTracker = () => {
   // State
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [notification, setNotification] = useState(null);
+  const [notification, setNotification] = useState<string | null>(null);
   const [showAddHabitModal, setShowAddHabitModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [newHabitName, setNewHabitName] = useState('');
@@ -118,7 +129,7 @@ const HabitTracker = () => {
   }, [darkMode]);
 
   // Handlers
-  const handleUpdateHabitProgress = (habit, newValue) => {
+  const handleUpdateHabitProgress = (habit: Habit, newValue: number) => {
     setHabits(habits.map(h => {
       if (h.id === habit.id) {
         return {
@@ -159,7 +170,7 @@ const HabitTracker = () => {
     showNotify(`Added new habit: ${newHabitName}`);
   };
 
-  const handleDeleteHabit = (habitId) => {
+  const handleDeleteHabit = (habitId: string) => {
     const habitToDelete = habits.find(h => h.id === habitId);
     if (habitToDelete) {
       setHabits(habits.filter(h => h.id !== habitId));
@@ -167,8 +178,10 @@ const HabitTracker = () => {
     }
   };
 
-  const showNotify = (message) => {
-    setNotification(message);
+  const showNotify = (message: string | null) => {
+    if (typeof message === 'string' || message === null) {
+      setNotification(message);
+    }
     if (notificationTimeoutRef.current) {
       clearTimeout(notificationTimeoutRef.current);
     }
@@ -423,7 +436,7 @@ const HabitTracker = () => {
                         <Cell key={`cell-${index}`} fill={habit.color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => `${value.toFixed(1)}%`} />
+                    <Tooltip formatter={(value) => (typeof value === 'number' ? `${value.toFixed(1)}%` : `${value}%`)} />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
