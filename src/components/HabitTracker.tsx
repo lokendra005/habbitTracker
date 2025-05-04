@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, SetStateAction } from 'react';
+import { useState, useEffect, useRef} from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
