@@ -9,8 +9,6 @@ import { format, subDays } from 'date-fns';
 const HabitTracker = () => {
   // State
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [showModal, setShowModal] = useState(false);
-  const [modalContent, setModalContent] = useState('');
   const [notification, setNotification] = useState(null);
   const [showAddHabitModal, setShowAddHabitModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -20,7 +18,7 @@ const HabitTracker = () => {
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('darkMode') === 'true' ||
-        (!('darkMode' in localStorage) && 
+         (!('darkMode' in localStorage) && 
          window.matchMedia('(prefers-color-scheme: dark)').matches);
     }
     return false;
@@ -139,7 +137,6 @@ const HabitTracker = () => {
       showNotify('Please enter a habit name');
       return;
     }
-    
     const newHabit = {
       id: Date.now().toString(),
       name: newHabitName,
@@ -217,7 +214,6 @@ const HabitTracker = () => {
           </button>
         </div>
       </nav>
-
       {/* Main content */}
       <main className="max-w-5xl mx-auto p-4">
         {/* Header */}
@@ -257,13 +253,12 @@ const HabitTracker = () => {
             Statistics
           </button>
         </div>
-
         {/* Dashboard */}
         {activeTab === 'dashboard' && (
           <div className="space-y-6">
             {/* Today's Summary */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Today's Progress</h2>
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Today&apos;s Progress</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {habits.map(habit => (
                   <div key={habit.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 flex items-center">
@@ -386,7 +381,7 @@ const HabitTracker = () => {
 
                 <div>
                   <label className="text-sm text-gray-600 dark:text-gray-400 mb-1 block">
-                    Today's progress: {habit.progress} / {habit.goal} {habit.unit}
+                    Today&apos;s progress: {habit.progress} / {habit.goal} {habit.unit}
                   </label>
                   <input 
                     type="range" 
